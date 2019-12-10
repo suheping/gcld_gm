@@ -106,6 +106,7 @@ def getPlayerList():
 
 # 获取玩家数据
 def getPlayerData():
+    global playerId
     # 拿到现在选择的是哪个玩家、玩家等级、金币数量
     playerName = ui.comboBox.currentText()
     print(playerName)
@@ -540,7 +541,7 @@ def generals():
         database='gcld_sdata',
         charset='utf8')
     cursor1 = conn1.cursor(cursor=pymysql.cursors.DictCursor)
-    cursor1.execute('SELECT id ,name from general;')
+    cursor1.execute('SELECT id ,name from general where type=2')
     res_grenerals = cursor1.fetchall()
     gs = general_list + res_grenerals
     return gs
@@ -599,6 +600,7 @@ def setup():
     # 初始化数据
     # 神将、魔将列表
     general_list = []
+    general_list.append({'id': 0,'name': '不变'})
     general_list.append({'id': 269, 'name': '神·陈宫'})
     general_list.append({'id': 270, 'name': '神·郭嘉'})
     general_list.append({'id': 271, 'name': '神·陆逊'})
@@ -633,7 +635,27 @@ def setup():
 def modify_base():
     # 如果已经连接数据库
     if ui.Button_connectDB.text() == '断开连接':
-        cursor.execute('')
+        # 获取界面中角色等级、金币
+        t_player_lv = ui.lineEdit_lv.text()
+        t_player_gold = ui.lineEdit_gold.text()
+        # 获取界面中 银币、木材、粮食、铁
+        t_player_copper = ui.lineEdit_copper.text()
+        t_player_wood = ui.lineEdit_wood.text()
+        t_player_food = ui.lineEdit_food.text()
+        t_player_iron = ui.lineEdit_iron.text()
+        try:
+            # 修改等级、金币
+            cursor.execute("UPDATE player set player_lv = %s , sys_gold = %s where player_id = %s",
+                           (t_player_lv, t_player_gold, playerId))
+            # 修改银币、木材、粮食、铁
+            cursor.execute(
+                "UPDATE player_resource SET copper =%s , wood =%s , food =%s , iron =%s where player_id = %s",
+                (t_player_copper, t_player_wood, t_player_food, t_player_iron, playerId))
+            conn.commit()
+        except Exception as e:
+            print("更新基本信息报错！！！")
+        else:
+            print("更新基本信息成功！！")
     else:
         print('请先连接数据库，再修改基础数据！')
 
@@ -642,7 +664,36 @@ def modify_base():
 def modify_weapon():
     # 如果已经连接数据库
     if ui.Button_connectDB.text() == '断开连接':
-        cursor.execute('')
+        try:
+            if ui.lineEdit_w1.isEnabled(): # 判断武器1是否已开放
+                t_w1 = ui.lineEdit_w1.text()
+                cursor.execute("UPDATE player_weapon set lv = %s where player_id = %s and weapon_id = 1",
+                               (t_w1, playerId))
+            if ui.lineEdit_w2.isEnabled():
+                t_w2 = ui.lineEdit_w2.text()
+                cursor.execute("UPDATE player_weapon set lv = %s where player_id = %s and weapon_id = 2",
+                               (t_w2, playerId))
+            if ui.lineEdit_w3.isEnabled():
+                t_w3 = ui.lineEdit_w3.text()
+                cursor.execute("UPDATE player_weapon set lv = %s where player_id = %s and weapon_id = 3",
+                               (t_w3, playerId))
+            if ui.lineEdit_w4.isEnabled():
+                t_w4 = ui.lineEdit_w4.text()
+                cursor.execute("UPDATE player_weapon set lv = %s where player_id = %s and weapon_id = 4",
+                               (t_w4, playerId))
+            if ui.lineEdit_w5.isEnabled():
+                t_w5 = ui.lineEdit_w5.text()
+                cursor.execute("UPDATE player_weapon set lv = %s where player_id = %s and weapon_id = 5",
+                               (t_w5, playerId))
+            if ui.lineEdit_w6.isEnabled():
+                t_w6 = ui.lineEdit_w6.text()
+                cursor.execute("UPDATE player_weapon set lv = %s where player_id = %s and weapon_id = 6",
+                               (t_w6, playerId))
+            conn.commit()
+        except Exception as e:
+            print('更新武器信息失败！！！')
+        else:
+            print('更新武器信息成功！！')
     else:
         print('请先连接数据库，再修改兵器等级！')
 
@@ -651,7 +702,171 @@ def modify_weapon():
 def modify_general():
     # 如果已经连接数据库
     if ui.Button_connectDB.text() == '断开连接':
-        cursor.execute('')
+        try:
+            # 修改武将1
+            if ui.lineEdit_jl1.isEnabled():
+                # 获取武将1的名字
+                s_jn1 = ui.lineEdit_j1.text()
+                # 转换为武将1的id
+                s_ji1 = getIdByName(s_jn1)
+                # 获取界面上的等级
+                t_jl1 = ui.lineEdit_jl1.text()
+                # 获取目标武将
+                t_jn1 = ui.comboBox_tj1.currentText()
+                if t_jn1 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji1 = getIdByName(t_jn1)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji1 = s_ji1
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji1, t_jl1, playerId, s_ji1))
+                conn.commit()
+            # 修改武将2
+            if ui.lineEdit_jl2.isEnabled():
+                # 获取武将2的名字
+                s_jn2 = ui.lineEdit_j2.text()
+                # 转换为武将2的id
+                s_ji2 = getIdByName(s_jn2)
+                # 获取界面上的等级
+                t_jl2 = ui.lineEdit_jl2.text()
+                # 获取目标武将
+                t_jn2 = ui.comboBox_tj2.currentText()
+                if t_jn2 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji2 = getIdByName(t_jn2)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji2 = s_ji2
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji2, t_jl2, playerId, s_ji2))
+                conn.commit()
+            # 修改武将3
+            if ui.lineEdit_jl3.isEnabled():
+                # 获取武将3的名字
+                s_jn3 = ui.lineEdit_j3.text()
+                # 转换为武将3的id
+                s_ji3 = getIdByName(s_jn3)
+                # 获取界面上的等级
+                t_jl3 = ui.lineEdit_jl3.text()
+                # 获取目标武将
+                t_jn3 = ui.comboBox_tj3.currentText()
+                if t_jn3 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji3 = getIdByName(t_jn3)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji3 = s_ji3
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji3, t_jl3, playerId, s_ji3))
+                conn.commit()
+            # 修改武将4
+            if ui.lineEdit_jl4.isEnabled():
+                # 获取武将4的名字
+                s_jn4 = ui.lineEdit_j4.text()
+                # 转换为武将4的id
+                s_ji4 = getIdByName(s_jn4)
+                # 获取界面上的等级
+                t_jl4 = ui.lineEdit_jl4.text()
+                # 获取目标武将
+                t_jn4 = ui.comboBox_tj4.currentText()
+                if t_jn4 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji4 = getIdByName(t_jn4)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji4 = s_ji4
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji4, t_jl4, playerId, s_ji4))
+                conn.commit()
+            # 修改武将5
+            if ui.lineEdit_jl5.isEnabled():
+                # 获取武将5的名字
+                s_jn5 = ui.lineEdit_j5.text()
+                # 转换为武将5的id
+                s_ji5 = getIdByName(s_jn5)
+                # 获取界面上的等级
+                t_jl5 = ui.lineEdit_jl5.text()
+                # 获取目标武将
+                t_jn5 = ui.comboBox_tj5.currentText()
+                if t_jn5 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji5 = getIdByName(t_jn5)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji5 = s_ji5
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji5, t_jl5, playerId, s_ji5))
+                conn.commit()
+            # 修改武将6
+            if ui.lineEdit_jl6.isEnabled():
+                # 获取武将6的名字
+                s_jn6 = ui.lineEdit_j6.text()
+                # 转换为武将6的id
+                s_ji6 = getIdByName(s_jn6)
+                # 获取界面上的等级
+                t_jl6 = ui.lineEdit_jl6.text()
+                # 获取目标武将
+                t_jn6 = ui.comboBox_tj6.currentText()
+                if t_jn6 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji6 = getIdByName(t_jn6)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji6 = s_ji6
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji6, t_jl6, playerId, s_ji6))
+                conn.commit()
+            # 修改武将7
+            if ui.lineEdit_jl7.isEnabled():
+                # 获取武将7的名字
+                s_jn7 = ui.lineEdit_j7.text()
+                # 转换为武将7的id
+                s_ji7 = getIdByName(s_jn7)
+                # 获取界面上的等级
+                t_jl7 = ui.lineEdit_jl7.text()
+                # 获取目标武将
+                t_jn7 = ui.comboBox_tj7.currentText()
+                if t_jn7 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji7 = getIdByName(t_jn7)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji7 = s_ji7
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji7, t_jl7, playerId, s_ji7))
+                conn.commit()
+            # 修改武将8
+            if ui.lineEdit_jl8.isEnabled():
+                # 获取武将8的名字
+                s_jn8 = ui.lineEdit_j8.text()
+                # 转换为武将8的id
+                s_ji8 = getIdByName(s_jn8)
+                # 获取界面上的等级
+                t_jl8 = ui.lineEdit_jl8.text()
+                # 获取目标武将
+                t_jn8 = ui.comboBox_tj8.currentText()
+                if t_jn8 != '不变':  # 如果选择了目标武将
+                    # 获取目标武将id
+                    t_ji8 = getIdByName(t_jn8)
+                else:
+                    # 目标武将id不变，仍为原武将id
+                    t_ji8 = s_ji8
+                # 执行sql更新武将信息
+                cursor.execute("UPDATE player_general_military set general_id=%s , lv=%s where player_id = %s and general_id = %s",
+                               (t_ji8, t_jl8, playerId, s_ji8))
+                conn.commit()
+        except Exception as e:
+            print('修改武将失败！！！')
+        else:
+            print('修改武将成功！！！')
     else:
         print('请先连接数据库，再修改武将信息！')
 
@@ -660,7 +875,14 @@ def modify_general():
 def send_tulong():
     # 如果已经连接数据库
     if ui.Button_connectDB.text() == '断开连接':
-        cursor.execute('')
+        try:
+            cursor.execute("INSERT INTO store_house ( `player_id`, `item_id`, `type`, `goods_type`, `owner`, `lv`, `attribute`, `quality`, `gem_id`, `num`, `state`, `refresh_attribute`, `quenching_times`, `quenching_times_free`, `special_skill_id`, `bind_expire_time`, `mark_id`) VALUES ( %s, 525, 14, 14, 0, 0, NULL, 6, 0, 1, 0, '', 0, 0, 0, 0, 0)",
+                           playerId)
+            conn.commit()
+        except Exception as e:
+            print('送真屠龙失败！！！')
+        else:
+            print('送真屠龙成功！！！')
     else:
         print('请先连接数据库，再赠送真屠龙！')
 
@@ -669,9 +891,25 @@ def send_tulong():
 def send_jingshi():
     # 如果已经连接数据库
     if ui.Button_connectDB.text() == '断开连接':
-        cursor.execute('')
+        try:
+            cursor.execute("INSERT INTO store_house ( `player_id`, `item_id`, `type`, `goods_type`, `owner`, `lv`, `attribute`, `quality`, `gem_id`, `num`, `state`, `refresh_attribute`, `quenching_times`, `quenching_times_free`, `special_skill_id`, `bind_expire_time`, `mark_id`) VALUES (%s, 1080, 2, 1, 0, 80, '0', 15, 0, 1, 0, '4:5;3:5;1:5;2:5', 0, NULL, NULL, 0, 0)",
+                           playerId)
+            conn.commit()
+        except Exception as e:
+            print('送顶级晶石失败！！！')
+        else:
+            print('送顶级晶石成功！！！！')
     else:
         print('请先连接数据库，再赠送顶级晶石！')
+
+
+# 通过武将名称取到gid
+def getIdByName(name):
+    gid = 225
+    for i in gs:
+        if name == i.get('name'):
+            gid = i.get('id')
+    return gid
 
 
 def click_success():
