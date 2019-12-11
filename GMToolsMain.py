@@ -3,11 +3,12 @@
 import sys
 
 import pymysql
+from PyQt5.QtCore import QRegExp
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
 
 import GMTools
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QDialog, QPushButton, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
 
 
 # 连接数据库gcld
@@ -64,7 +65,6 @@ def connectDB():
         # 清空所有页面输入框
         clearAll()
 
-
 # 获取玩家列表，并显示在下拉框中
 def getPlayerList():
     global cursor
@@ -73,6 +73,7 @@ def getPlayerList():
             cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
             cursor.execute("select player_id, player_name from player;")
             res = cursor.fetchall()
+            print(res)
         except Exception as e:
             print(e)
             res = None
@@ -90,7 +91,6 @@ def getPlayerList():
             ui.comboBox.setCurrentIndex(0)
     else:
         QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
-
 
 # 获取玩家数据
 def getPlayerData():
@@ -514,94 +514,6 @@ def getPlayerData():
     else:
         QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
 
-
-# 断开数据库连接后，清理所有输入框中的数据
-def clearAll():
-    # 玩家列表
-    ui.comboBox.clear()
-    # 基础信息
-    ui.lineEdit_lv.clear()
-    ui.lineEdit_gold.clear()
-    ui.lineEdit_copper.clear()
-    ui.lineEdit_wood.clear()
-    ui.lineEdit_food.clear()
-    ui.lineEdit_iron.clear()
-    # 兵器等级
-    ui.lineEdit_w1.clear()
-    ui.lineEdit_w2.clear()
-    ui.lineEdit_w3.clear()
-    ui.lineEdit_w4.clear()
-    ui.lineEdit_w5.clear()
-    ui.lineEdit_w6.clear()
-    # 武将
-    ui.lineEdit_j1.clear()
-    ui.lineEdit_j2.clear()
-    ui.lineEdit_j3.clear()
-    ui.lineEdit_j4.clear()
-    ui.lineEdit_j5.clear()
-    ui.lineEdit_j6.clear()
-    ui.lineEdit_j7.clear()
-    ui.lineEdit_j8.clear()
-    # 武将等级
-    ui.lineEdit_jl1.clear()
-    ui.lineEdit_jl2.clear()
-    ui.lineEdit_jl3.clear()
-    ui.lineEdit_jl4.clear()
-    ui.lineEdit_jl5.clear()
-    ui.lineEdit_jl6.clear()
-    ui.lineEdit_jl7.clear()
-    ui.lineEdit_jl8.clear()
-    # 神将下拉框
-    ui.comboBox_tj1.clear()
-    ui.comboBox_tj2.clear()
-    ui.comboBox_tj3.clear()
-    ui.comboBox_tj4.clear()
-    ui.comboBox_tj5.clear()
-    ui.comboBox_tj6.clear()
-    ui.comboBox_tj7.clear()
-    ui.comboBox_tj8.clear()
-
-
-# 初始化数据
-def setup():
-    global general_list, tjs, gs, player_name_list, res_base, res_resource, res_weapon, res_general,playerId,playerName,playerStatus
-    # 初始化数据
-    # 神将、魔将列表
-    general_list = []
-    general_list.append({'id': 0,'name': '不变'})
-    general_list.append({'id': 269, 'name': '神·陈宫'})
-    general_list.append({'id': 270, 'name': '神·郭嘉'})
-    general_list.append({'id': 271, 'name': '神·陆逊'})
-    general_list.append({'id': 272, 'name': '神·周瑜'})
-    general_list.append({'id': 273, 'name': '神·吕布'})
-    general_list.append({'id': 274, 'name': '魔·赵云'})
-    general_list.append({'id': 275, 'name': '魔·诸葛'})
-    general_list.append({'id': 276, 'name': '魔·孙权'})
-    general_list.append({'id': 277, 'name': '魔·曹操'})
-    general_list.append({'id': 278, 'name': '魔·刘备'})
-    # 魔将、神将 名称列表
-    tjs = []
-    for i in general_list:
-        tjs.append(i.get('name'))
-    # # 全部武将信息
-    gs = [{'id': 0, 'name': '不变'}, {'id': 269, 'name': '神·陈宫'}, {'id': 270, 'name': '神·郭嘉'}, {'id': 271, 'name': '神·陆逊'}, {'id': 272, 'name': '神·周瑜'}, {'id': 273, 'name': '神·吕布'}, {'id': 274, 'name': '魔·赵云'}, {'id': 275, 'name': '魔·诸葛'}, {'id': 276, 'name': '魔·孙权'}, {'id': 277, 'name': '魔·曹操'}, {'id': 278, 'name': '魔·刘备'}, {'id': 110, 'name': '陆逊'}, {'id': 201, 'name': '吕布'}, {'id': 202, 'name': '张飞'}, {'id': 203, 'name': '关羽'}, {'id': 204, 'name': '赵云'}, {'id': 205, 'name': '马超'}, {'id': 206, 'name': '太史慈'}, {'id': 207, 'name': '许褚'}, {'id': 208, 'name': '典韦'}, {'id': 209, 'name': '张辽'}, {'id': 210, 'name': '孙策'}, {'id': 211, 'name': '黄忠'}, {'id': 212, 'name': '夏侯惇'}, {'id': 213, 'name': '夏侯渊'}, {'id': 214, 'name': '徐晃'}, {'id': 215, 'name': '甘宁'}, {'id': 217, 'name': '庞德'}, {'id': 218, 'name': '魏延'}, {'id': 219, 'name': '吕蒙'}, {'id': 220, 'name': '孙尚香'}, {'id': 221, 'name': '张郃'}, {'id': 222, 'name': '文丑'}, {'id': 223, 'name': '颜良'}, {'id': 224, 'name': '周泰'}, {'id': 225, 'name': '华雄'}, {'id': 226, 'name': '曹彰'}, {'id': 227, 'name': '严颜'}, {'id': 228, 'name': '董卓'}, {'id': 229, 'name': '张任'}, {'id': 230, 'name': '黄盖'}, {'id': 231, 'name': '关兴'}, {'id': 232, 'name': '孟获'}, {'id': 233, 'name': '廖化'}, {'id': 234, 'name': '曹洪'}, {'id': 235, 'name': '祝融'}, {'id': 236, 'name': '张苞'}, {'id': 237, 'name': '曹仁'}, {'id': 238, 'name': '夏侯霸'}, {'id': 239, 'name': '周仓'}, {'id': 240, 'name': '高顺'}, {'id': 241, 'name': '孙坚'}, {'id': 242, 'name': '凌统'}, {'id': 243, 'name': '程普'}, {'id': 244, 'name': '袁绍'}, {'id': 245, 'name': '马岱'}, {'id': 246, 'name': '淳于琼'}, {'id': 247, 'name': '张济'}, {'id': 248, 'name': '于禁'}, {'id': 249, 'name': '臧霸'}, {'id': 250, 'name': '关平'}, {'id': 251, 'name': '马腾'}, {'id': 252, 'name': '侯成'}, {'id': 253, 'name': '潘凤'}, {'id': 254, 'name': '魏续'}, {'id': 255, 'name': '樊稠'}, {'id': 256, 'name': '李典'}, {'id': 257, 'name': '韩当'}, {'id': 258, 'name': '宋宪'}, {'id': 259, 'name': '张梁'}, {'id': 260, 'name': '韩遂'}, {'id': 261, 'name': '李傕'}, {'id': 262, 'name': '郭汜'}, {'id': 263, 'name': '祖茂'}, {'id': 264, 'name': '徐荣'}, {'id': 265, 'name': '乐进'}, {'id': 267, 'name': '姜维'}, {'id': 268, 'name': '司马懿'}]
-    # 玩家列表
-    player_name_list = []
-    # 玩家id name
-    playerId = ''
-    playerName = ''
-    # 是否已选择用户
-    playerStatus = False
-    # 玩家基本信息
-    res_base = []
-    # 玩家资源信息
-    res_resource = []
-    # 玩家兵器信息
-    res_weapon = []
-    # 玩家武将信息
-    res_general = []
-
-
 # 修改基础信息
 def modify_base():
     # 如果已经连接数据库
@@ -636,7 +548,6 @@ def modify_base():
             QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
         else:
             QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
-
 
 # 修改兵器等级
 def modify_weapon():
@@ -681,7 +592,6 @@ def modify_weapon():
             QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
         else:
             QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
-
 
 # 修改武将信息
 def modify_general():
@@ -861,7 +771,6 @@ def modify_general():
         else:
             QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
-
 # 送一套真屠龙
 def send_tulong():
     global playerStatus
@@ -882,7 +791,6 @@ def send_tulong():
             QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
         else:
             QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
-
 
 # 送一个顶级晶石
 def send_jingshi():
@@ -905,6 +813,90 @@ def send_jingshi():
         else:
             QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
+# 断开数据库连接后，清理所有输入框中的数据
+def clearAll():
+    # 玩家列表
+    ui.comboBox.clear()
+    # 基础信息
+    ui.lineEdit_lv.clear()
+    ui.lineEdit_gold.clear()
+    ui.lineEdit_copper.clear()
+    ui.lineEdit_wood.clear()
+    ui.lineEdit_food.clear()
+    ui.lineEdit_iron.clear()
+    # 兵器等级
+    ui.lineEdit_w1.clear()
+    ui.lineEdit_w2.clear()
+    ui.lineEdit_w3.clear()
+    ui.lineEdit_w4.clear()
+    ui.lineEdit_w5.clear()
+    ui.lineEdit_w6.clear()
+    # 武将
+    ui.lineEdit_j1.clear()
+    ui.lineEdit_j2.clear()
+    ui.lineEdit_j3.clear()
+    ui.lineEdit_j4.clear()
+    ui.lineEdit_j5.clear()
+    ui.lineEdit_j6.clear()
+    ui.lineEdit_j7.clear()
+    ui.lineEdit_j8.clear()
+    # 武将等级
+    ui.lineEdit_jl1.clear()
+    ui.lineEdit_jl2.clear()
+    ui.lineEdit_jl3.clear()
+    ui.lineEdit_jl4.clear()
+    ui.lineEdit_jl5.clear()
+    ui.lineEdit_jl6.clear()
+    ui.lineEdit_jl7.clear()
+    ui.lineEdit_jl8.clear()
+    # 神将下拉框
+    ui.comboBox_tj1.clear()
+    ui.comboBox_tj2.clear()
+    ui.comboBox_tj3.clear()
+    ui.comboBox_tj4.clear()
+    ui.comboBox_tj5.clear()
+    ui.comboBox_tj6.clear()
+    ui.comboBox_tj7.clear()
+    ui.comboBox_tj8.clear()
+
+# 初始化数据
+def setup():
+    global general_list, tjs, gs, player_name_list, res_base, res_resource, res_weapon, res_general,playerId,playerName,playerStatus
+    # 初始化数据
+    # 神将、魔将列表
+    general_list = []
+    general_list.append({'id': 0,'name': '不变'})
+    general_list.append({'id': 269, 'name': '神·陈宫'})
+    general_list.append({'id': 270, 'name': '神·郭嘉'})
+    general_list.append({'id': 271, 'name': '神·陆逊'})
+    general_list.append({'id': 272, 'name': '神·周瑜'})
+    general_list.append({'id': 273, 'name': '神·吕布'})
+    general_list.append({'id': 274, 'name': '魔·赵云'})
+    general_list.append({'id': 275, 'name': '魔·诸葛'})
+    general_list.append({'id': 276, 'name': '魔·孙权'})
+    general_list.append({'id': 277, 'name': '魔·曹操'})
+    general_list.append({'id': 278, 'name': '魔·刘备'})
+    # 魔将、神将 名称列表
+    tjs = []
+    for i in general_list:
+        tjs.append(i.get('name'))
+    # # 全部武将信息
+    gs = [{'id': 0, 'name': '不变'}, {'id': 269, 'name': '神·陈宫'}, {'id': 270, 'name': '神·郭嘉'}, {'id': 271, 'name': '神·陆逊'}, {'id': 272, 'name': '神·周瑜'}, {'id': 273, 'name': '神·吕布'}, {'id': 274, 'name': '魔·赵云'}, {'id': 275, 'name': '魔·诸葛'}, {'id': 276, 'name': '魔·孙权'}, {'id': 277, 'name': '魔·曹操'}, {'id': 278, 'name': '魔·刘备'}, {'id': 110, 'name': '陆逊'}, {'id': 201, 'name': '吕布'}, {'id': 202, 'name': '张飞'}, {'id': 203, 'name': '关羽'}, {'id': 204, 'name': '赵云'}, {'id': 205, 'name': '马超'}, {'id': 206, 'name': '太史慈'}, {'id': 207, 'name': '许褚'}, {'id': 208, 'name': '典韦'}, {'id': 209, 'name': '张辽'}, {'id': 210, 'name': '孙策'}, {'id': 211, 'name': '黄忠'}, {'id': 212, 'name': '夏侯惇'}, {'id': 213, 'name': '夏侯渊'}, {'id': 214, 'name': '徐晃'}, {'id': 215, 'name': '甘宁'}, {'id': 217, 'name': '庞德'}, {'id': 218, 'name': '魏延'}, {'id': 219, 'name': '吕蒙'}, {'id': 220, 'name': '孙尚香'}, {'id': 221, 'name': '张郃'}, {'id': 222, 'name': '文丑'}, {'id': 223, 'name': '颜良'}, {'id': 224, 'name': '周泰'}, {'id': 225, 'name': '华雄'}, {'id': 226, 'name': '曹彰'}, {'id': 227, 'name': '严颜'}, {'id': 228, 'name': '董卓'}, {'id': 229, 'name': '张任'}, {'id': 230, 'name': '黄盖'}, {'id': 231, 'name': '关兴'}, {'id': 232, 'name': '孟获'}, {'id': 233, 'name': '廖化'}, {'id': 234, 'name': '曹洪'}, {'id': 235, 'name': '祝融'}, {'id': 236, 'name': '张苞'}, {'id': 237, 'name': '曹仁'}, {'id': 238, 'name': '夏侯霸'}, {'id': 239, 'name': '周仓'}, {'id': 240, 'name': '高顺'}, {'id': 241, 'name': '孙坚'}, {'id': 242, 'name': '凌统'}, {'id': 243, 'name': '程普'}, {'id': 244, 'name': '袁绍'}, {'id': 245, 'name': '马岱'}, {'id': 246, 'name': '淳于琼'}, {'id': 247, 'name': '张济'}, {'id': 248, 'name': '于禁'}, {'id': 249, 'name': '臧霸'}, {'id': 250, 'name': '关平'}, {'id': 251, 'name': '马腾'}, {'id': 252, 'name': '侯成'}, {'id': 253, 'name': '潘凤'}, {'id': 254, 'name': '魏续'}, {'id': 255, 'name': '樊稠'}, {'id': 256, 'name': '李典'}, {'id': 257, 'name': '韩当'}, {'id': 258, 'name': '宋宪'}, {'id': 259, 'name': '张梁'}, {'id': 260, 'name': '韩遂'}, {'id': 261, 'name': '李傕'}, {'id': 262, 'name': '郭汜'}, {'id': 263, 'name': '祖茂'}, {'id': 264, 'name': '徐荣'}, {'id': 265, 'name': '乐进'}, {'id': 267, 'name': '姜维'}, {'id': 268, 'name': '司马懿'}]
+    # 玩家列表
+    player_name_list = []
+    # 玩家id name
+    playerId = ''
+    playerName = ''
+    # 是否已选择用户
+    playerStatus = False
+    # 玩家基本信息
+    res_base = []
+    # 玩家资源信息
+    res_resource = []
+    # 玩家兵器信息
+    res_weapon = []
+    # 玩家武将信息
+    res_general = []
 
 # 通过武将名称取到gid
 def getIdByName(name):
@@ -914,9 +906,52 @@ def getIdByName(name):
             gid = i.get('id')
     return gid
 
+# 控件输入验证
+def xianzhi():
+    # 定义等级验证器 1到200的整数
+    # lv_validator = QIntValidator(1,200)
+    lv_validator = QRegExpValidator()
+    lv_reg = QRegExp("0|200|1{0,1}[1-9]{1,2}")
+    lv_validator.setRegExp(lv_reg)
+    # 玩家等级加验证
+    ui.lineEdit_lv.setValidator(lv_validator)
+    # 兵器等级加验证
+    ui.lineEdit_w1.setValidator(lv_validator)
+    ui.lineEdit_w2.setValidator(lv_validator)
+    ui.lineEdit_w3.setValidator(lv_validator)
+    ui.lineEdit_w4.setValidator(lv_validator)
+    ui.lineEdit_w5.setValidator(lv_validator)
+    ui.lineEdit_w6.setValidator(lv_validator)
+    # 武将等级输入框加验证
+    ui.lineEdit_jl1.setValidator(lv_validator)
+    ui.lineEdit_jl2.setValidator(lv_validator)
+    ui.lineEdit_jl3.setValidator(lv_validator)
+    ui.lineEdit_jl4.setValidator(lv_validator)
+    ui.lineEdit_jl5.setValidator(lv_validator)
+    ui.lineEdit_jl6.setValidator(lv_validator)
+    ui.lineEdit_jl7.setValidator(lv_validator)
+    ui.lineEdit_jl8.setValidator(lv_validator)
 
-def click_success():
-    print("啊哈哈哈我终于成功了！")
+    # 定义资源数量验证器 1到int(11)的整数
+    # resource_validator = QIntValidator()
+    resource_validator = QRegExpValidator()
+    resource_reg = QRegExp("[1-9]\\d{1,10}|0")
+    resource_validator.setRegExp(resource_reg)
+    # 资源输入框加验证
+    ui.lineEdit_copper.setValidator(resource_validator)
+    ui.lineEdit_wood.setValidator(resource_validator)
+    ui.lineEdit_food.setValidator(resource_validator)
+    ui.lineEdit_iron.setValidator(resource_validator)
+    # 金币输入框加验证，与资源的验证相同
+    ui.lineEdit_gold.setValidator(resource_validator)
+
+
+
+
+
+
+
+
 
 
 
@@ -928,6 +963,8 @@ if __name__ == '__main__':
     ui = GMTools.Ui_mainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
+    # 加限制
+    xianzhi()
     # 设置默认数据
     ui.lineEdit.setText('127.0.0.1')
     ui.lineEdit_2.setText('3306')
