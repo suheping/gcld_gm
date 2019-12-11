@@ -60,7 +60,7 @@ def connectDB():
         QMessageBox.information(MainWindow, '提示信息', '数据库连接已断开！！！', QMessageBox.Ok)
         print('-----------------------------------数据库连接已断开-------------------------------------')
         # 几个重要数据置为空
-        # setup()
+        setup()
         # 清空所有页面输入框
         clearAll()
 
@@ -564,7 +564,7 @@ def clearAll():
 
 # 初始化数据
 def setup():
-    global general_list, tjs, gs, player_name_list, res_base, res_resource, res_weapon, res_general
+    global general_list, tjs, gs, player_name_list, res_base, res_resource, res_weapon, res_general,playerId,playerName,playerStatus
     # 初始化数据
     # 神将、魔将列表
     general_list = []
@@ -587,6 +587,11 @@ def setup():
     gs = [{'id': 0, 'name': '不变'}, {'id': 269, 'name': '神·陈宫'}, {'id': 270, 'name': '神·郭嘉'}, {'id': 271, 'name': '神·陆逊'}, {'id': 272, 'name': '神·周瑜'}, {'id': 273, 'name': '神·吕布'}, {'id': 274, 'name': '魔·赵云'}, {'id': 275, 'name': '魔·诸葛'}, {'id': 276, 'name': '魔·孙权'}, {'id': 277, 'name': '魔·曹操'}, {'id': 278, 'name': '魔·刘备'}, {'id': 110, 'name': '陆逊'}, {'id': 201, 'name': '吕布'}, {'id': 202, 'name': '张飞'}, {'id': 203, 'name': '关羽'}, {'id': 204, 'name': '赵云'}, {'id': 205, 'name': '马超'}, {'id': 206, 'name': '太史慈'}, {'id': 207, 'name': '许褚'}, {'id': 208, 'name': '典韦'}, {'id': 209, 'name': '张辽'}, {'id': 210, 'name': '孙策'}, {'id': 211, 'name': '黄忠'}, {'id': 212, 'name': '夏侯惇'}, {'id': 213, 'name': '夏侯渊'}, {'id': 214, 'name': '徐晃'}, {'id': 215, 'name': '甘宁'}, {'id': 217, 'name': '庞德'}, {'id': 218, 'name': '魏延'}, {'id': 219, 'name': '吕蒙'}, {'id': 220, 'name': '孙尚香'}, {'id': 221, 'name': '张郃'}, {'id': 222, 'name': '文丑'}, {'id': 223, 'name': '颜良'}, {'id': 224, 'name': '周泰'}, {'id': 225, 'name': '华雄'}, {'id': 226, 'name': '曹彰'}, {'id': 227, 'name': '严颜'}, {'id': 228, 'name': '董卓'}, {'id': 229, 'name': '张任'}, {'id': 230, 'name': '黄盖'}, {'id': 231, 'name': '关兴'}, {'id': 232, 'name': '孟获'}, {'id': 233, 'name': '廖化'}, {'id': 234, 'name': '曹洪'}, {'id': 235, 'name': '祝融'}, {'id': 236, 'name': '张苞'}, {'id': 237, 'name': '曹仁'}, {'id': 238, 'name': '夏侯霸'}, {'id': 239, 'name': '周仓'}, {'id': 240, 'name': '高顺'}, {'id': 241, 'name': '孙坚'}, {'id': 242, 'name': '凌统'}, {'id': 243, 'name': '程普'}, {'id': 244, 'name': '袁绍'}, {'id': 245, 'name': '马岱'}, {'id': 246, 'name': '淳于琼'}, {'id': 247, 'name': '张济'}, {'id': 248, 'name': '于禁'}, {'id': 249, 'name': '臧霸'}, {'id': 250, 'name': '关平'}, {'id': 251, 'name': '马腾'}, {'id': 252, 'name': '侯成'}, {'id': 253, 'name': '潘凤'}, {'id': 254, 'name': '魏续'}, {'id': 255, 'name': '樊稠'}, {'id': 256, 'name': '李典'}, {'id': 257, 'name': '韩当'}, {'id': 258, 'name': '宋宪'}, {'id': 259, 'name': '张梁'}, {'id': 260, 'name': '韩遂'}, {'id': 261, 'name': '李傕'}, {'id': 262, 'name': '郭汜'}, {'id': 263, 'name': '祖茂'}, {'id': 264, 'name': '徐荣'}, {'id': 265, 'name': '乐进'}, {'id': 267, 'name': '姜维'}, {'id': 268, 'name': '司马懿'}]
     # 玩家列表
     player_name_list = []
+    # 玩家id name
+    playerId = ''
+    playerName = ''
+    # 是否已选择用户
+    playerStatus = False
     # 玩家基本信息
     res_base = []
     # 玩家资源信息
@@ -600,7 +605,11 @@ def setup():
 # 修改基础信息
 def modify_base():
     # 如果已经连接数据库
-    if ui.Button_connectDB.text() == '断开连接':
+    global playerStatus
+    if playerId != '':
+        playerStatus = True
+
+    if playerStatus:
         # 获取界面中角色等级、金币
         t_player_lv = ui.lineEdit_lv.text()
         t_player_gold = ui.lineEdit_gold.text()
@@ -623,13 +632,20 @@ def modify_base():
         else:
             QMessageBox.information(MainWindow, '提示信息', '修改基础信息成功！！！', QMessageBox.Ok)
     else:
-        QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        if ui.Button_connectDB.text() == '连接数据库':
+            QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        else:
+            QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
 
 # 修改兵器等级
 def modify_weapon():
+    global playerStatus
+    if playerId != '':
+        playerStatus = True
+
     # 如果已经连接数据库
-    if ui.Button_connectDB.text() == '断开连接':
+    if playerStatus:
         try:
             if ui.lineEdit_w1.isEnabled(): # 判断武器1是否已开放
                 t_w1 = ui.lineEdit_w1.text()
@@ -661,13 +677,19 @@ def modify_weapon():
         else:
             QMessageBox.information(MainWindow, '提示信息', '更新兵器信息成功！！！', QMessageBox.Ok)
     else:
-        QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        if ui.Button_connectDB.text() == '连接数据库':
+            QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        else:
+            QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
 
 # 修改武将信息
 def modify_general():
-    # 如果已经连接数据库
-    if ui.Button_connectDB.text() == '断开连接':
+    global playerStatus
+    if playerId != '':
+        playerStatus = True
+
+    if playerStatus:
         try:
             # 修改武将1
             if ui.lineEdit_jl1.isEnabled():
@@ -834,13 +856,19 @@ def modify_general():
         else:
             QMessageBox.information(MainWindow, '提示信息', '更新武将信息成功！！！', QMessageBox.Ok)
     else:
-        QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        if ui.Button_connectDB.text() == '连接数据库':
+            QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        else:
+            QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
 
 # 送一套真屠龙
 def send_tulong():
-    # 如果已经连接数据库
-    if ui.Button_connectDB.text() == '断开连接':
+    global playerStatus
+    if playerId != '':
+        playerStatus = True
+
+    if playerStatus:
         try:
             cursor.execute("INSERT INTO store_house ( `player_id`, `item_id`, `type`, `goods_type`, `owner`, `lv`, `attribute`, `quality`, `gem_id`, `num`, `state`, `refresh_attribute`, `quenching_times`, `quenching_times_free`, `special_skill_id`, `bind_expire_time`, `mark_id`) VALUES ( %s, 525, 14, 14, 0, 0, NULL, 6, 0, 1, 0, '', 0, 0, 0, 0, 0)",
                            playerId)
@@ -850,13 +878,19 @@ def send_tulong():
         else:
             QMessageBox.information(MainWindow, '提示信息', '已赠送真屠龙！！！', QMessageBox.Ok)
     else:
-        QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        if ui.Button_connectDB.text() == '连接数据库':
+            QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        else:
+            QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
 
 # 送一个顶级晶石
 def send_jingshi():
-    # 如果已经连接数据库
-    if ui.Button_connectDB.text() == '断开连接':
+    global playerStatus
+    if playerId != '':
+        playerStatus = True
+
+    if playerStatus:
         try:
             cursor.execute("INSERT INTO store_house ( `player_id`, `item_id`, `type`, `goods_type`, `owner`, `lv`, `attribute`, `quality`, `gem_id`, `num`, `state`, `refresh_attribute`, `quenching_times`, `quenching_times_free`, `special_skill_id`, `bind_expire_time`, `mark_id`) VALUES (%s, 1080, 2, 1, 0, 80, '0', 15, 0, 1, 0, '4:5;3:5;1:5;2:5', 0, NULL, NULL, 0, 0)",
                            playerId)
@@ -866,7 +900,10 @@ def send_jingshi():
         else:
             QMessageBox.information(MainWindow, '提示信息', '已赠送顶级晶石！！！', QMessageBox.Ok)
     else:
-        QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        if ui.Button_connectDB.text() == '连接数据库':
+            QMessageBox.warning(MainWindow, '提示信息', '请先连接数据库！！！', QMessageBox.Ok)
+        else:
+            QMessageBox.warning(MainWindow, '提示信息', '请先选择用户！！！', QMessageBox.Ok)
 
 
 # 通过武将名称取到gid
