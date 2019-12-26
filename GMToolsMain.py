@@ -909,7 +909,6 @@ def getIdByName(name):
 # 控件输入验证
 def xianzhi():
     # 定义等级验证器 1到200的整数
-    # lv_validator = QIntValidator(1,200)
     lv_validator = QRegExpValidator()
     lv_reg = QRegExp("0|200|1{0,1}[1-9]{1,2}")
     lv_validator.setRegExp(lv_reg)
@@ -944,14 +943,6 @@ def xianzhi():
     ui.lineEdit_iron.setValidator(resource_validator)
     # 金币输入框加验证，与资源的验证相同
     ui.lineEdit_gold.setValidator(resource_validator)
-
-
-
-
-
-
-
-
 
 
 
